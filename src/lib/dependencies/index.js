@@ -1,6 +1,8 @@
 /**
  * @author Vinicius Figueiredo <vinifig@hotmail.com>
  */
-import * as lib from './lib';
+import IO from './io';
 
-export default lib;
+export default {
+  IO
+};
