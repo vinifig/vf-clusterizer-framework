@@ -61,3 +61,4 @@ typings/
 
 # builted file
 dist/
+out/

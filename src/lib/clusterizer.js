@@ -2,50 +2,22 @@
  * @author Vinicius Figueiredo <vinifig@hotmail.com>
  *
  *
- * @name Clusterizer
- *   @description Core class for distribute process
+ * @class Clusterizer
+ * @constructor
+ * @description Core class for distribute process
  *
  */
-export default class Clusterizer {
+class Clusterizer {
   /**
-   * @name constructor
+   * @constructor
    *
-   *
-   *
-   * @param config
-   *   @required
-   *   @type {Object}
-   *
-   *    @attribute id
-   *      @required
-   *      @type {Any}
-   *      @description Clusterized process id
-   *
-   *    @attribute devices
-   *      @type {Device[]}
-   *      @required
-   *      @description List of Devices to cluster
-   *
-   *    @attribute size
-   *      @type {Integer}
-   *      @description Size of data to cluster. If needed
-   *      @default Infinity
-   *
-   *    @attribute step
-   *      @type {Integer}
-   *      @description step of data iteration. If needed
-   *      @default 1
-   *
-   * @param dependencies
-   *   @type {Dependency[]}
-   *   @required
-   *
-   * @param script
-   *   @type {Function}
-   *     @param info
-   *       @desc Iteration of script info
-   *     @param ..dependencies
-   *   @required
+   * @param config {Object}
+   * @param config.id {Any} Clusterized process id(pid)
+   * @param config.devices {Device[]} List of Devices to cluster
+   * @param [config.size=Infinity] {Integer} Size of data to cluster. If Needed.
+   * @param [config.step=1] {Integer} Step of data iteration. If Needed.
+   * @param dependencies {Dependency[]} List of Dependencies of type {@link Dependency} from {@link Dependencies} module.
+   * @param script {Function}
    **/
   constructor (config, dependencies, script) {
     if (! config) {
@@ -75,18 +47,34 @@ export default class Clusterizer {
     this._script = script;
   }
 
+  /**
+   * @member Clusterizer#id {Any} - Getter of Clusterizer id
+   **/
   get id () {
     return this._id;
   }
 
+
+  /**
+   * @member Clusterizer#script {String} - Getter of Clusterizer Script String
+   **/
   get script () {
     return this._script.toString();
   }
 
+  /**
+   * @member Clusterizer#dependencies {Dependency[]} - Getter of Clusterizer {@link Dependency Dependencies} Array.
+   **/
   get dependencies () {
     return this._dependencies;
   }
 
+  /**
+   * @member Clusterizer#message {object} - Getter of Clusterizer Message Object.
+   * @property Clusterizer.message.id {any} - Clusterizer ID
+   * @property Clusterizer.message.script {String} - Clusterizer Script String
+   * @property Clusterizer.message.dependencies {Dependency[]} - Clusterizer Dependencies Array
+   **/
   get message () {
     return {
       id: this.id,
@@ -95,7 +83,13 @@ export default class Clusterizer {
     }
   }
 
+  /**
+   * @method Clusterizer#toString
+   * @description To String Clusterizer Method Override
+   * @returns {String} Clusterizer Message String
+   **/
   toString () {
-    return this.message;
+    return this.message.toString();
   }
 }
+export default Clusterizer;

@@ -18,6 +18,5 @@ let script = function (info, IO) {
 
 let cluster = new Clusterizer (config, dependencies, script);
 
-console.log(cluster.message)
 io = new IO();
 io.textContent += JSON.stringify(cluster.message);
