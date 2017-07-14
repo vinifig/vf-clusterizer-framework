@@ -1,3 +1,6 @@
+import * as io from 'socket.io-client';
+import ClusterManager from './cluster/cluster-manager';
+
 /**
  * @author Vinicius Figueiredo <vinifig@hotmail.com>
  *
@@ -14,7 +17,7 @@ class Clusterizer {
    * @param config {Object}
    * @param config.id {Any} Clusterized process id(pid)
    * @param config.devices {Device[]} List of Devices to cluster
-   * @param [config.size=Infinity] {Integer} Size of data to cluster. If Needed.
+   * @param [config.totalSize=0] {Integer} Size of data to cluster. If Needed.
    * @param [config.step=1] {Integer} Step of data iteration. If Needed.
    * @param dependencies {Dependency[]} List of Dependencies of type {@link Dependency} from {@link Dependencies} module.
    * @param script {Function}
@@ -42,7 +45,8 @@ class Clusterizer {
 
     this._id = config.id;
     this._devices = config.devices;
-    this._size = config.size || Infinity;
+    this._step = config.step || 1;
+    this._totalSize = config.totalSize || 0;
     this._dependencies = dependencies;
     this._script = script;
   }
@@ -70,6 +74,13 @@ class Clusterizer {
   }
 
   /**
+   * @member Clusterizer#devices {String[]} - Getter of devices;
+   **/
+  get devices () {
+    return this._devices;
+  }
+
+  /**
    * @member Clusterizer#message {object} - Getter of Clusterizer Message Object.
    * @property Clusterizer.message.id {any} - Clusterizer ID
    * @property Clusterizer.message.script {String} - Clusterizer Script String
@@ -77,12 +88,30 @@ class Clusterizer {
    **/
   get message () {
     return {
-      id: this.id,
-      script: this.script,
-      dependencies: this.dependencies
+      id: this._id,
+      script: this._script.toString(),
+      dependencies: this._dependencies,
+      totalSize: this._totalSize,
+      step: this._step,
     }
   }
 
+  start () {
+    let clusterManager = new ClusterManager();
+    let message = this.message;
+    let devices = this.devices;
+    let devicesLength = devices.length || 1;
+    let deviceSize = message.totalSize / devicesLength;
+    
+    message.size = deviceSize;
+
+    for (let i = 0, device = devices[i]; i < devices.length; i++) {
+      message.start = i * deviceSize;
+      clusterManager.register(device);
+    }
+    let promise = clusterManager.execute(message);
+    return promise;
+  }
   /**
    * @method Clusterizer#toString
    * @description To String Clusterizer Method Override

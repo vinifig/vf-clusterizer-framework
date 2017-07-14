@@ -1,22 +1,28 @@
 const Lib = require('../dist')
 const Clusterizer = Lib.Clusterizer;
-const IO = Lib.Dependencies.IO;
 
 let id = Date.now().toString();
-let devices = []
+let devices = ['http://localhost:8080'];
 let config = {
   id,
-  devices
+  devices,
+  totalSize: 1,
+  step: 1
 }
 
-let dependencies = [IO];
+let dependencies = ['IO'];
 
 let script = function (info, IO) {
-  console.log('oi');
+  return 'executado';
 }
 
 
-let cluster = new Clusterizer (config, dependencies, script);
+let clusterized = new Clusterizer (config, dependencies, script);
 
-io = new IO();
-io.textContent += JSON.stringify(cluster.message);
+clusterized.start()
+           .then(function (result) {
+             result.forEach(console.dir.bind())
+           })
+           .catch(function (fail) {
+             console.dir(fail)
+           });
