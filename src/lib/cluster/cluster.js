@@ -4,28 +4,44 @@
 const io = require('socket.io-client');
 
 class Cluster {
-  constructor (path) {
+  
+  constructor (path, message) {
+    this.path = path;
     this.socket = io(path);
+    this.message = message;
     this.promise = Promise.defer();
   }
 
-  send (message) {
-    this.socket.emit('start-process', message);
+  send () {
+    this.socket.emit('start-process', this.message);
+  }
+
+  disconnect () {
+    return this.socket.disconnect(true);
+  }
+
+
+  response (data) {
+    this.disconnect();
+
+    data.device = this.path;
+
+    if (data.error) {
+      return this.promise.reject(data)
+    }
+
+    return this.promise.resolve(data);
   }
 
   watch (key) {
-    this.socket.on(`response-${key}`, (data) => {
-      if (data.error) {
-        return this.promise.reject(data)
-      }
-      return this.promise.resolve(data);
-    })
+    this.socket.on(`response-${this.message.id}`, this.response.bind(this));
   }
 
-  execute (message) {
-    this.watch(message.id);
-    this.send(message);
+  execute () {
+    this.watch();
+    this.send();
     return this.promise;
   }
+
 }
 export default Cluster;

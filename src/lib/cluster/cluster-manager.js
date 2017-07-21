@@ -5,19 +5,19 @@
 import Cluster from './cluster';
 
 class ClusterManager {
-  constructor (socket) {
+  constructor () {
     this.clusters = [];
   }
 
-  execute (message) {
+  execute () {
     let promises = this.clusters.map((cluster)=>{
-      return cluster.execute(message).promise;
+      return cluster.execute().promise;
     })
     return Promise.all(promises);
   }
 
-  register (path) {
-    let cluster = new Cluster (path);
+  register (path, message) {
+    let cluster = new Cluster (path, message);
     this.clusters.push(cluster);
   }
 }
